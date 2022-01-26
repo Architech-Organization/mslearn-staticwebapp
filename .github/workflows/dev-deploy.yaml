@@ -1,0 +1,35 @@
+name: Dev Deploy
+
+on:
+  push:
+    branches: # array of glob patterns matching against refs/heads. Optional; defaults to all
+      - dev # triggers on pushes that contain changes in develop
+
+env:
+  AZURE_WEBAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
+  NODE_VERSION: '14.x' # set this to the node version to use
+
+jobs:
+  dev-build-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Build react app
+        working-directory: ./react-app
+        run: |
+          npm ci
+          npm run build
+          
+      - name: Deploy to Azure
+        working-directory: ./react-app
+        uses: TravisSpomer/deploy-to-azure-storage@v1.4.0
+        with:
+          source-path: build
+          sas-url: ${{ secrets.DEPLOY_SAS_URL_DEV }}
