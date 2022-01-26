@@ -28,8 +28,7 @@ jobs:
           npm run build
           
       - name: Deploy to Azure
-        working-directory: ./react-app
         uses: TravisSpomer/deploy-to-azure-storage@v1.4.0
         with:
-          source-path: build
+          source-path: react-app/build
           sas-url: ${{ secrets.DEPLOY_SAS_URL_DEV }}
